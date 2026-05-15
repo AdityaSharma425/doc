@@ -1,0 +1,4040 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MarkControl — Engineering Submission</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Sora:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0a0c0f;
+        --bg2: #111318;
+        --bg3: #181c23;
+        --border: rgba(255, 255, 255, 0.08);
+        --border2: rgba(255, 255, 255, 0.14);
+        --text: #e8eaf0;
+        --muted: #7a8090;
+        --dim: #4a505e;
+        --accent: #5b8ef8;
+        --accent2: #3dd68c;
+        --amber: #f5a623;
+        --danger: #e05c5c;
+        --purple: #a78bfa;
+        --teal: #2dd4bf;
+        --mono: "IBM Plex Mono", monospace;
+        --sans: "Sora", sans-serif;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--sans);
+        font-size: 15px;
+        line-height: 1.75;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* ---- Layout ---- */
+      .wrap {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 0 32px;
+      }
+
+      /* ---- Cover ---- */
+      .cover {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 80px 0 60px;
+        border-bottom: 1px solid var(--border);
+        position: relative;
+        overflow: hidden;
+      }
+      .cover-grid {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background-image:
+          linear-gradient(to right, var(--border) 1px, transparent 1px),
+          linear-gradient(to bottom, var(--border) 1px, transparent 1px);
+        background-size: 60px 60px;
+        mask-image: radial-gradient(
+          ellipse 80% 80% at 50% 50%,
+          black 0%,
+          transparent 100%
+        );
+      }
+      .tag {
+        display: inline-block;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--accent);
+        background: rgba(91, 142, 248, 0.1);
+        border: 1px solid rgba(91, 142, 248, 0.25);
+        border-radius: 4px;
+        padding: 3px 10px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 20px;
+      }
+      h1.title {
+        font-size: clamp(36px, 6vw, 64px);
+        font-weight: 700;
+        line-height: 1.05;
+        letter-spacing: -0.03em;
+        color: #fff;
+      }
+      h1.title span {
+        color: var(--accent);
+      }
+      .subtitle {
+        margin-top: 16px;
+        font-size: 17px;
+        color: var(--muted);
+        font-weight: 300;
+        max-width: 560px;
+      }
+      .meta-row {
+        display: flex;
+        gap: 32px;
+        margin-top: 40px;
+        flex-wrap: wrap;
+      }
+      .meta-item label {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--dim);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        display: block;
+        margin-bottom: 4px;
+      }
+      .meta-item span {
+        font-size: 14px;
+        color: var(--text);
+      }
+      .pill-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 32px;
+      }
+      .pill {
+        font-family: var(--mono);
+        font-size: 11px;
+        padding: 4px 12px;
+        border-radius: 100px;
+        border: 1px solid var(--border2);
+        color: var(--muted);
+      }
+      .pill.green {
+        border-color: rgba(61, 214, 140, 0.3);
+        color: var(--accent2);
+        background: rgba(61, 214, 140, 0.06);
+      }
+
+      /* ---- Nav ---- */
+      .nav {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: rgba(10, 12, 15, 0.85);
+        backdrop-filter: blur(16px);
+        border-bottom: 1px solid var(--border);
+      }
+      .nav-inner {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        height: 52px;
+        overflow-x: auto;
+      }
+      .nav-inner a {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        text-decoration: none;
+        white-space: nowrap;
+        padding: 0 18px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        border-right: 1px solid var(--border);
+        transition: color 0.2s;
+      }
+      .nav-inner a:hover {
+        color: var(--text);
+      }
+      .nav-inner a:first-child {
+        border-left: 1px solid var(--border);
+      }
+
+      /* ---- Sections ---- */
+      section {
+        padding: 80px 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .section-label {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 12px;
+      }
+      h2 {
+        font-size: 28px;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        color: #fff;
+        margin-bottom: 20px;
+      }
+      h3 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #fff;
+        margin-bottom: 10px;
+        margin-top: 36px;
+      }
+      h4 {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 8px;
+        font-family: var(--mono);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      p {
+        color: #b0b8cc;
+        margin-bottom: 16px;
+      }
+      p:last-child {
+        margin-bottom: 0;
+      }
+      strong {
+        color: var(--text);
+        font-weight: 600;
+      }
+      code {
+        font-family: var(--mono);
+        font-size: 13px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid var(--border2);
+        border-radius: 4px;
+        padding: 1px 6px;
+        color: #c9d1e3;
+      }
+
+      /* ---- Diagram container ---- */
+      .diagram-wrap {
+        margin: 36px 0;
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      .diagram-header {
+        padding: 12px 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .diagram-header .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--accent);
+      }
+      .diagram-header span {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .diagram-body {
+        padding: 24px;
+      }
+      .diagram-body svg {
+        width: 100%;
+        display: block;
+      }
+
+      /* ---- Cards ---- */
+      .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin: 24px 0;
+      }
+      .card {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 20px;
+      }
+      .card-icon {
+        font-size: 22px;
+        margin-bottom: 12px;
+      }
+      .card h4 {
+        font-size: 13px;
+        color: var(--text);
+        margin-bottom: 6px;
+      }
+      .card p {
+        font-size: 13px;
+        color: var(--muted);
+        margin: 0;
+      }
+      .card.accent-green {
+        border-color: rgba(61, 214, 140, 0.2);
+      }
+      .card.accent-blue {
+        border-color: rgba(91, 142, 248, 0.2);
+      }
+      .card.accent-amber {
+        border-color: rgba(245, 166, 35, 0.2);
+      }
+      .card.accent-danger {
+        border-color: rgba(224, 92, 92, 0.2);
+      }
+
+      /* ---- Code block ---- */
+      .code-block {
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px 0;
+        overflow-x: auto;
+      }
+      .code-block pre {
+        font-family: var(--mono);
+        font-size: 13px;
+        color: #c9d1e3;
+        line-height: 1.6;
+        white-space: pre;
+      }
+      .code-block .kw {
+        color: var(--purple);
+      }
+      .code-block .fn {
+        color: var(--accent);
+      }
+      .code-block .str {
+        color: var(--accent2);
+      }
+      .code-block .cm {
+        color: var(--dim);
+      }
+      .code-block .num {
+        color: var(--amber);
+      }
+
+      /* ---- Table ---- */
+      .table-wrap {
+        overflow-x: auto;
+        margin: 24px 0;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+      th {
+        font-family: var(--mono);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+        padding: 10px 14px;
+        text-align: left;
+        border-bottom: 1px solid var(--border2);
+      }
+      td {
+        padding: 10px 14px;
+        color: #b0b8cc;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      tr:hover td {
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      /* ---- Priority badge ---- */
+      .priority {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .priority-num {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: var(--accent);
+        color: #fff;
+        font-family: var(--mono);
+        font-size: 11px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      /* ---- Status ---- */
+      .status-dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 6px;
+      }
+      .status-dot.green {
+        background: var(--accent2);
+      }
+      .status-dot.amber {
+        background: var(--amber);
+      }
+      .status-dot.red {
+        background: var(--danger);
+      }
+
+      /* ---- Q&A ---- */
+      .qa-block {
+        margin: 28px 0;
+      }
+      .qa-q {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 8px 8px 0 0;
+        padding: 16px 20px;
+      }
+      .qa-q p {
+        color: var(--text);
+        font-weight: 500;
+        margin: 0;
+      }
+      .qa-a {
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-top: none;
+        border-radius: 0 0 8px 8px;
+        padding: 16px 20px;
+      }
+      .qa-a p {
+        color: #b0b8cc;
+        margin: 0;
+      }
+      .qa-a p + p {
+        margin-top: 12px;
+      }
+
+      /* ---- Divider ---- */
+      .divider {
+        height: 1px;
+        background: var(--border);
+        margin: 32px 0;
+      }
+
+      /* ---- Callout ---- */
+      .callout {
+        border-left: 3px solid var(--accent);
+        background: rgba(91, 142, 248, 0.06);
+        border-radius: 0 8px 8px 0;
+        padding: 16px 20px;
+        margin: 20px 0;
+      }
+      .callout.amber {
+        border-color: var(--amber);
+        background: rgba(245, 166, 35, 0.06);
+      }
+      .callout.green {
+        border-color: var(--accent2);
+        background: rgba(61, 214, 140, 0.06);
+      }
+      .callout p {
+        margin: 0;
+        color: #b0b8cc;
+        font-size: 14px;
+      }
+
+      /* ---- File tree ---- */
+      .tree {
+        font-family: var(--mono);
+        font-size: 13px;
+        color: #b0b8cc;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 20px;
+        line-height: 2;
+      }
+      .tree .dir {
+        color: var(--accent);
+      }
+      .tree .file {
+        color: var(--muted);
+      }
+      .tree .note {
+        color: var(--dim);
+        font-size: 11px;
+      }
+
+      /* ---- Footer ---- */
+      footer {
+        padding: 48px 0;
+        text-align: center;
+      }
+      footer p {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--dim);
+      }
+
+      @media (max-width: 600px) {
+        .wrap {
+          padding: 0 20px;
+        }
+        section {
+          padding: 56px 0;
+        }
+        h2 {
+          font-size: 22px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- COVER -->
+    <div class="wrap">
+      <div class="cover">
+        <div class="cover-grid"></div>
+        <div style="position: relative">
+          <div class="tag">Engineering Assignment — Fixit</div>
+          <h1 class="title">Mark<span>Control</span></h1>
+          <p class="subtitle">
+            Enterprise Feature Flag Control Plane — a production-grade mark
+            evaluation system built with FastAPI, Next.js 14, and a
+            deterministic in-memory evaluation engine.
+          </p>
+          <div class="meta-row">
+            <div class="meta-item">
+              <label>Backend</label
+              ><span>FastAPI + SQLAlchemy + SQLite/Postgres</span>
+            </div>
+            <div class="meta-item">
+              <label>Frontend</label><span>Next.js 14 + Tailwind CSS</span>
+            </div>
+            <div class="meta-item">
+              <label>Infra</label><span>Docker Compose (3 services)</span>
+            </div>
+          </div>
+          <div class="pill-row">
+            <span class="pill green">D1 Evaluation API ✓</span>
+            <span class="pill green">D2 Engine Module ✓</span>
+            <span class="pill green">D3 React Provider ✓</span>
+            <span class="pill green">D4 Admin Console ✓</span>
+            <span class="pill green">D5 Tests + Docker ✓</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NAV -->
+    <nav class="nav">
+      <div class="wrap">
+        <div class="nav-inner">
+          <a href="#overview">Overview</a>
+          <a href="#architecture">Architecture</a>
+          <a href="#engine">Engine</a>
+          <a href="#api">API</a>
+          <a href="#frontend">Frontend</a>
+          <a href="#admin">Admin</a>
+          <a href="#challenges">Challenges</a>
+          <a href="#questions">Q&amp;A</a>
+          <a href="#roadmap">Roadmap</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- OVERVIEW -->
+    <section id="overview">
+      <div class="wrap">
+        <div class="section-label">01 — Overview</div>
+        <h2>What was built</h2>
+        <p>
+          MarkControl is a full-stack feature flag control plane that decouples
+          code deployment from feature release. It lets engineering teams ship
+          continuously while controlling who sees what — per user, per org, per
+          plan — with no redeploys required.
+        </p>
+
+        <div class="card-grid">
+          <div class="card accent-green">
+            <div class="card-icon">⚡</div>
+            <h4>In-memory evaluation</h4>
+            <p>
+              Rules are loaded from DB (or 60s TTL cache) and evaluated entirely
+              in Python — no DB hit per flag check.
+            </p>
+          </div>
+          <div class="card accent-blue">
+            <div class="card-icon">🎯</div>
+            <h4>5-level priority chain</h4>
+            <p>
+              User → Org → Plan → Attribute → Percentage → Default.
+              Deterministic, documented as a constant.
+            </p>
+          </div>
+          <div class="card accent-amber">
+            <div class="card-icon">🔒</div>
+            <h4>Separate auth layers</h4>
+            <p>
+              Public <code>/evaluate</code> endpoint is read-only. Admin
+              endpoints require <code>x-admin-token</code> header.
+            </p>
+          </div>
+          <div class="card accent-danger">
+            <div class="card-icon">📋</div>
+            <h4>Full audit trail</h4>
+            <p>
+              Every create, update, and rule mutation is persisted with actor,
+              timestamp, old state, and new state JSON.
+            </p>
+          </div>
+        </div>
+
+        <h3>Project structure</h3>
+        <div class="tree">
+          <span class="dir">markcontrol/</span><br />
+          ├── <span class="dir">backend/app/</span><br />
+          │ ├── <span class="dir">api/</span>
+          <span class="note">marks.py — all HTTP endpoints</span><br />
+          │ ├── <span class="dir">core/</span>
+          <span class="note">engine.py client.py context.py constants.py</span
+          ><br />
+          │ ├── <span class="dir">models/</span>
+          <span class="note">SQLAlchemy ORM models</span><br />
+          │ ├── <span class="dir">schemas/</span>
+          <span class="note">Pydantic request/response models</span><br />
+          │ └── <span class="dir">tests/</span>
+          <span class="note">test_engine.py — pure unit tests</span><br />
+          ├── <span class="dir">frontend/src/</span><br />
+          │ ├── <span class="dir">app/</span>
+          <span class="note">page.tsx (demo) admin/page.tsx</span><br />
+          │ └── <span class="dir">providers/</span>
+          <span class="note">MarkProvider.tsx useMark.ts</span><br />
+          ├── <span class="file">docker-compose.yaml</span>
+          <span class="note">postgres + backend + frontend</span><br />
+          └── <span class="file">seed.sql</span>
+          <span class="note">3 marks, 5 orgs, 4 users, rules</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ARCHITECTURE -->
+    <section id="architecture">
+      <div class="wrap">
+        <div class="section-label">02 — Architecture</div>
+        <h2>System architecture</h2>
+        <p>
+          The system follows a strict layered design. The React frontend holds
+          no evaluation logic — it is a pure consumer of the
+          <code>/evaluate</code> endpoint, which acts as the single source of
+          truth for both sides of the stack.
+        </p>
+
+        <!-- ARCHITECTURE DIAGRAM -->
+        <div class="diagram-wrap">
+          <div class="diagram-header">
+            <div class="dot"></div>
+            <span>System overview — request flow</span>
+          </div>
+          <div class="diagram-body">
+            <svg viewBox="0 0 800 420" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker
+                  id="arr"
+                  viewBox="0 0 10 10"
+                  refX="8"
+                  refY="5"
+                  markerWidth="6"
+                  markerHeight="6"
+                  orient="auto-start-reverse"
+                >
+                  <path
+                    d="M2 1L8 5L2 9"
+                    fill="none"
+                    stroke="context-stroke"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </marker>
+              </defs>
+
+              <!-- Frontend box -->
+              <rect
+                x="30"
+                y="60"
+                width="180"
+                height="290"
+                rx="10"
+                fill="rgba(91,142,248,0.06)"
+                stroke="rgba(91,142,248,0.3)"
+                stroke-width="1"
+              />
+              <text
+                x="120"
+                y="88"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#5b8ef8"
+                letter-spacing="0.06em"
+              >
+                FRONTEND
+              </text>
+              <rect
+                x="50"
+                y="102"
+                width="140"
+                height="40"
+                rx="6"
+                fill="rgba(91,142,248,0.12)"
+                stroke="rgba(91,142,248,0.25)"
+                stroke-width="0.5"
+              />
+              <text
+                x="120"
+                y="126"
+                text-anchor="middle"
+                font-family="'Sora'"
+                font-size="12"
+                fill="#c9d1e3"
+              >
+                MarkProvider
+              </text>
+              <rect
+                x="50"
+                y="154"
+                width="140"
+                height="40"
+                rx="6"
+                fill="rgba(91,142,248,0.12)"
+                stroke="rgba(91,142,248,0.25)"
+                stroke-width="0.5"
+              />
+              <text
+                x="120"
+                y="178"
+                text-anchor="middle"
+                font-family="'Sora'"
+                font-size="12"
+                fill="#c9d1e3"
+              >
+                useMark( ) hook
+              </text>
+              <rect
+                x="50"
+                y="206"
+                width="140"
+                height="40"
+                rx="6"
+                fill="rgba(91,142,248,0.12)"
+                stroke="rgba(91,142,248,0.25)"
+                stroke-width="0.5"
+              />
+              <text
+                x="120"
+                y="230"
+                text-anchor="middle"
+                font-family="'Sora'"
+                font-size="12"
+                fill="#c9d1e3"
+              >
+                localStorage cache
+              </text>
+              <rect
+                x="50"
+                y="258"
+                width="140"
+                height="40"
+                rx="6"
+                fill="rgba(91,142,248,0.12)"
+                stroke="rgba(91,142,248,0.25)"
+                stroke-width="0.5"
+              />
+              <text
+                x="120"
+                y="282"
+                text-anchor="middle"
+                font-family="'Sora'"
+                font-size="12"
+                fill="#c9d1e3"
+              >
+                Admin Console
+              </text>
+              <rect
+                x="50"
+                y="310"
+                width="140"
+                height="24"
+                rx="4"
+                fill="rgba(61,214,140,0.1)"
+                stroke="rgba(61,214,140,0.25)"
+                stroke-width="0.5"
+              />
+              <text
+                x="120"
+                y="326"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#3dd68c"
+              >
+                Offline fallback ✓
+              </text>
+
+              <!-- Arrows: Provider → API -->
+              <line
+                x1="190"
+                y1="122"
+                x2="288"
+                y2="170"
+                stroke="#5b8ef8"
+                stroke-width="1"
+                stroke-dasharray="4 3"
+                marker-end="url(#arr)"
+              />
+              <text
+                x="220"
+                y="148"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#4a505e"
+              >
+                POST /evaluate
+              </text>
+
+              <!-- Arrows: Admin → Admin API -->
+              <line
+                x1="190"
+                y1="278"
+                x2="288"
+                y2="278"
+                stroke="#f5a623"
+                stroke-width="1"
+                stroke-dasharray="4 3"
+                marker-end="url(#arr)"
+              />
+              <text
+                x="238"
+                y="268"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#4a505e"
+              >
+                PATCH /admin/...
+              </text>
+
+              <!-- Backend box -->
+              <rect
+                x="290"
+                y="40"
+                width="220"
+                height="340"
+                rx="10"
+                fill="rgba(167,139,250,0.05)"
+                stroke="rgba(167,139,250,0.25)"
+                stroke-width="1"
+              />
+              <text
+                x="400"
+                y="64"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#a78bfa"
+                letter-spacing="0.06em"
+              >
+                FASTAPI BACKEND
+              </text>
+
+              <rect
+                x="308"
+                y="78"
+                width="184"
+                height="40"
+                rx="6"
+                fill="rgba(167,139,250,0.12)"
+                stroke="rgba(167,139,250,0.25)"
+                stroke-width="0.5"
+              />
+              <text
+                x="400"
+                y="102"
+                text-anchor="middle"
+                font-family="'Sora'"
+                font-size="12"
+                fill="#c9d1e3"
+              >
+                POST /evaluate
+              </text>
+
+              <rect
+                x="308"
+                y="130"
+                width="184"
+                height="40"
+                rx="6"
+                fill="rgba(167,139,250,0.12)"
+                stroke="rgba(167,139,250,0.25)"
+                stroke-width="0.5"
+              />
+              <text
+                x="400"
+                y="154"
+                text-anchor="middle"
+                font-family="'Sora'"
+                font-size="12"
+                fill="#c9d1e3"
+              >
+                Admin CRUD endpoints
+              </text>
+
+              <!-- Core Engine section inside backend -->
+              <rect
+                x="308"
+                y="184"
+                width="184"
+                height="108"
+                rx="6"
+                fill="rgba(61,214,140,0.06)"
+                stroke="rgba(61,214,140,0.25)"
+                stroke-width="0.5"
+              />
+              <text
+                x="400"
+                y="206"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#3dd68c"
+              >
+                CORE ENGINE
+              </text>
+              <text
+                x="400"
+                y="225"
+                text-anchor="middle"
+                font-family="'Sora'"
+                font-size="12"
+                fill="#b0b8cc"
+              >
+                engine.py
+              </text>
+              <text
+                x="400"
+                y="244"
+                text-anchor="middle"
+                font-family="'Sora'"
+                font-size="12"
+                fill="#b0b8cc"
+              >
+                MarkClient (TTL cache)
+              </text>
+              <text
+                x="400"
+                y="263"
+                text-anchor="middle"
+                font-family="'Sora'"
+                font-size="12"
+                fill="#b0b8cc"
+              >
+                EvaluationContext
+              </text>
+              <text
+                x="400"
+                y="278"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#4a505e"
+              >
+                No HTTP dependency
+              </text>
+
+              <rect
+                x="308"
+                y="304"
+                width="184"
+                height="40"
+                rx="6"
+                fill="rgba(245,166,35,0.08)"
+                stroke="rgba(245,166,35,0.2)"
+                stroke-width="0.5"
+              />
+              <text
+                x="400"
+                y="328"
+                text-anchor="middle"
+                font-family="'Sora'"
+                font-size="12"
+                fill="#c9d1e3"
+              >
+                AuditLog writer
+              </text>
+              <rect
+                x="308"
+                y="356"
+                width="184"
+                height="16"
+                rx="4"
+                fill="rgba(61,214,140,0.1)"
+                stroke="rgba(61,214,140,0.2)"
+                stroke-width="0.5"
+              />
+              <text
+                x="400"
+                y="368"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#3dd68c"
+              >
+                Silent fail → default_value
+              </text>
+
+              <!-- DB box -->
+              <rect
+                x="560"
+                y="100"
+                width="200"
+                height="220"
+                rx="10"
+                fill="rgba(245,166,35,0.05)"
+                stroke="rgba(245,166,35,0.2)"
+                stroke-width="1"
+              />
+              <text
+                x="660"
+                y="124"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#f5a623"
+                letter-spacing="0.06em"
+              >
+                DATABASE
+              </text>
+
+              <rect
+                x="578"
+                y="138"
+                width="164"
+                height="30"
+                rx="5"
+                fill="rgba(245,166,35,0.1)"
+                stroke="rgba(245,166,35,0.2)"
+                stroke-width="0.5"
+              />
+              <text
+                x="660"
+                y="158"
+                text-anchor="middle"
+                font-family="'Sora'"
+                font-size="12"
+                fill="#c9d1e3"
+              >
+                marks
+              </text>
+
+              <rect
+                x="578"
+                y="178"
+                width="164"
+                height="30"
+                rx="5"
+                fill="rgba(245,166,35,0.1)"
+                stroke="rgba(245,166,35,0.2)"
+                stroke-width="0.5"
+              />
+              <text
+                x="660"
+                y="198"
+                text-anchor="middle"
+                font-family="'Sora'"
+                font-size="12"
+                fill="#c9d1e3"
+              >
+                mark_rules
+              </text>
+
+              <rect
+                x="578"
+                y="218"
+                width="164"
+                height="30"
+                rx="5"
+                fill="rgba(245,166,35,0.1)"
+                stroke="rgba(245,166,35,0.2)"
+                stroke-width="0.5"
+              />
+              <text
+                x="660"
+                y="238"
+                text-anchor="middle"
+                font-family="'Sora'"
+                font-size="12"
+                fill="#c9d1e3"
+              >
+                audit_logs
+              </text>
+
+              <rect
+                x="578"
+                y="258"
+                width="164"
+                height="30"
+                rx="5"
+                fill="rgba(245,166,35,0.1)"
+                stroke="rgba(245,166,35,0.2)"
+                stroke-width="0.5"
+              />
+              <text
+                x="660"
+                y="278"
+                text-anchor="middle"
+                font-family="'Sora'"
+                font-size="12"
+                fill="#c9d1e3"
+              >
+                memberships / orgs / users
+              </text>
+
+              <text
+                x="660"
+                y="310"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#4a505e"
+              >
+                SQLite (dev) / Postgres (prod)
+              </text>
+
+              <!-- Backend → DB -->
+              <line
+                x1="512"
+                y1="178"
+                x2="558"
+                y2="178"
+                stroke="#f5a623"
+                stroke-width="1"
+                stroke-dasharray="4 3"
+                marker-end="url(#arr)"
+              />
+              <line
+                x1="512"
+                y1="238"
+                x2="558"
+                y2="238"
+                stroke="#f5a623"
+                stroke-width="1"
+                stroke-dasharray="4 3"
+                marker-end="url(#arr)"
+              />
+
+              <!-- Cache annotation -->
+              <rect
+                x="290"
+                y="390"
+                width="220"
+                height="20"
+                rx="4"
+                fill="transparent"
+              />
+              <text
+                x="400"
+                y="404"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#4a505e"
+              >
+                TTLCache: 60s in-process cache
+              </text>
+            </svg>
+          </div>
+        </div>
+
+        <h3>Data model</h3>
+        <p>
+          The schema is designed around the separation of mark identity from
+          targeting logic. A <code>Mark</code> record holds the key, type, and
+          default. Rules are a separate table allowing N rules per mark, each
+          independently toggled.
+        </p>
+
+        <!-- ERD DIAGRAM -->
+        <div class="diagram-wrap">
+          <div class="diagram-header">
+            <div class="dot"></div>
+            <span>Schema — key relationships</span>
+          </div>
+          <div class="diagram-body">
+            <svg viewBox="0 0 800 360" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker
+                  id="arrw"
+                  viewBox="0 0 10 10"
+                  refX="8"
+                  refY="5"
+                  markerWidth="5"
+                  markerHeight="5"
+                  orient="auto-start-reverse"
+                >
+                  <path
+                    d="M2 1L8 5L2 9"
+                    fill="none"
+                    stroke="context-stroke"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </marker>
+              </defs>
+
+              <!-- marks table -->
+              <rect
+                x="60"
+                y="60"
+                width="180"
+                height="200"
+                rx="8"
+                fill="rgba(91,142,248,0.07)"
+                stroke="rgba(91,142,248,0.3)"
+                stroke-width="0.5"
+              />
+              <rect
+                x="60"
+                y="60"
+                width="180"
+                height="36"
+                rx="8"
+                fill="rgba(91,142,248,0.18)"
+                stroke="none"
+              />
+              <rect
+                x="60"
+                y="88"
+                width="180"
+                height="8"
+                rx="0"
+                fill="rgba(91,142,248,0.18)"
+              />
+              <text
+                x="150"
+                y="82"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="12"
+                font-weight="500"
+                fill="#5b8ef8"
+              >
+                marks
+              </text>
+              <text
+                x="76"
+                y="116"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#7a8090"
+              >
+                id
+              </text>
+              <text
+                x="230"
+                y="116"
+                text-anchor="end"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#4a505e"
+              >
+                PK, int
+              </text>
+              <text
+                x="76"
+                y="136"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#c9d1e3"
+              >
+                key
+              </text>
+              <text
+                x="230"
+                y="136"
+                text-anchor="end"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#4a505e"
+              >
+                unique str
+              </text>
+              <text
+                x="76"
+                y="156"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#b0b8cc"
+              >
+                type
+              </text>
+              <text
+                x="230"
+                y="156"
+                text-anchor="end"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#4a505e"
+              >
+                str
+              </text>
+              <text
+                x="76"
+                y="176"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#b0b8cc"
+              >
+                default_value
+              </text>
+              <text
+                x="230"
+                y="176"
+                text-anchor="end"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#4a505e"
+              >
+                str
+              </text>
+              <text
+                x="76"
+                y="196"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#b0b8cc"
+              >
+                is_active
+              </text>
+              <text
+                x="230"
+                y="196"
+                text-anchor="end"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#4a505e"
+              >
+                bool
+              </text>
+              <text
+                x="76"
+                y="216"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#b0b8cc"
+              >
+                parent_id
+              </text>
+              <text
+                x="230"
+                y="216"
+                text-anchor="end"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#4a505e"
+              >
+                FK → self
+              </text>
+              <text
+                x="76"
+                y="236"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#b0b8cc"
+              >
+                tags
+              </text>
+              <text
+                x="230"
+                y="236"
+                text-anchor="end"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#4a505e"
+              >
+                str
+              </text>
+
+              <!-- mark_rules -->
+              <rect
+                x="320"
+                y="30"
+                width="180"
+                height="220"
+                rx="8"
+                fill="rgba(167,139,250,0.07)"
+                stroke="rgba(167,139,250,0.3)"
+                stroke-width="0.5"
+              />
+              <rect
+                x="320"
+                y="30"
+                width="180"
+                height="36"
+                rx="8"
+                fill="rgba(167,139,250,0.18)"
+                stroke="none"
+              />
+              <rect
+                x="320"
+                y="58"
+                width="180"
+                height="8"
+                rx="0"
+                fill="rgba(167,139,250,0.18)"
+              />
+              <text
+                x="410"
+                y="52"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="12"
+                font-weight="500"
+                fill="#a78bfa"
+              >
+                mark_rules
+              </text>
+              <text
+                x="336"
+                y="86"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#7a8090"
+              >
+                id
+              </text>
+              <text
+                x="490"
+                y="86"
+                text-anchor="end"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#4a505e"
+              >
+                PK
+              </text>
+              <text
+                x="336"
+                y="106"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#c9d1e3"
+              >
+                mark_id
+              </text>
+              <text
+                x="490"
+                y="106"
+                text-anchor="end"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#4a505e"
+              >
+                FK → marks
+              </text>
+              <text
+                x="336"
+                y="126"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#b0b8cc"
+              >
+                rule_type
+              </text>
+              <text
+                x="490"
+                y="126"
+                text-anchor="end"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#4a505e"
+              >
+                user/org/plan/...
+              </text>
+              <text
+                x="336"
+                y="146"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#b0b8cc"
+              >
+                rule_value
+              </text>
+              <text
+                x="490"
+                y="146"
+                text-anchor="end"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#4a505e"
+              >
+                nullable str
+              </text>
+              <text
+                x="336"
+                y="166"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#b0b8cc"
+              >
+                percentage
+              </text>
+              <text
+                x="490"
+                y="166"
+                text-anchor="end"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#4a505e"
+              >
+                nullable int
+              </text>
+              <text
+                x="336"
+                y="186"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#b0b8cc"
+              >
+                variant
+              </text>
+              <text
+                x="490"
+                y="186"
+                text-anchor="end"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#4a505e"
+              >
+                nullable str
+              </text>
+              <text
+                x="336"
+                y="206"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#b0b8cc"
+              >
+                is_active
+              </text>
+              <text
+                x="490"
+                y="206"
+                text-anchor="end"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#4a505e"
+              >
+                bool
+              </text>
+
+              <!-- audit_logs -->
+              <rect
+                x="580"
+                y="60"
+                width="180"
+                height="200"
+                rx="8"
+                fill="rgba(245,166,35,0.07)"
+                stroke="rgba(245,166,35,0.25)"
+                stroke-width="0.5"
+              />
+              <rect
+                x="580"
+                y="60"
+                width="180"
+                height="36"
+                rx="8"
+                fill="rgba(245,166,35,0.18)"
+                stroke="none"
+              />
+              <rect
+                x="580"
+                y="88"
+                width="180"
+                height="8"
+                rx="0"
+                fill="rgba(245,166,35,0.18)"
+              />
+              <text
+                x="670"
+                y="82"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="12"
+                font-weight="500"
+                fill="#f5a623"
+              >
+                audit_logs
+              </text>
+              <text
+                x="596"
+                y="116"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#7a8090"
+              >
+                id
+              </text>
+              <text
+                x="750"
+                y="116"
+                text-anchor="end"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#4a505e"
+              >
+                PK
+              </text>
+              <text
+                x="596"
+                y="136"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#c9d1e3"
+              >
+                mark_id
+              </text>
+              <text
+                x="750"
+                y="136"
+                text-anchor="end"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#4a505e"
+              >
+                FK → marks
+              </text>
+              <text
+                x="596"
+                y="156"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#b0b8cc"
+              >
+                actor
+              </text>
+              <text
+                x="750"
+                y="156"
+                text-anchor="end"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#4a505e"
+              >
+                str
+              </text>
+              <text
+                x="596"
+                y="176"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#b0b8cc"
+              >
+                timestamp
+              </text>
+              <text
+                x="750"
+                y="176"
+                text-anchor="end"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#4a505e"
+              >
+                auto now
+              </text>
+              <text
+                x="596"
+                y="196"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#b0b8cc"
+              >
+                action
+              </text>
+              <text
+                x="750"
+                y="196"
+                text-anchor="end"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#4a505e"
+              >
+                str
+              </text>
+              <text
+                x="596"
+                y="216"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#b0b8cc"
+              >
+                old_state
+              </text>
+              <text
+                x="750"
+                y="216"
+                text-anchor="end"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#4a505e"
+              >
+                JSON
+              </text>
+              <text
+                x="596"
+                y="236"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#b0b8cc"
+              >
+                new_state
+              </text>
+              <text
+                x="750"
+                y="236"
+                text-anchor="end"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#4a505e"
+              >
+                JSON
+              </text>
+
+              <!-- Relations -->
+              <line
+                x1="240"
+                y1="150"
+                x2="318"
+                y2="140"
+                stroke="rgba(167,139,250,0.5)"
+                stroke-width="1"
+                marker-end="url(#arrw)"
+              />
+              <text
+                x="265"
+                y="140"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#4a505e"
+              >
+                1:N
+              </text>
+              <line
+                x1="500"
+                y1="140"
+                x2="578"
+                y2="156"
+                stroke="rgba(245,166,35,0.5)"
+                stroke-width="1"
+                marker-end="url(#arrw)"
+              />
+              <text
+                x="525"
+                y="145"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#4a505e"
+              >
+                1:N
+              </text>
+
+              <!-- Self ref -->
+              <path
+                d="M 150 260 Q 150 310 100 310 Q 50 310 50 260 Q 50 210 90 200"
+                fill="none"
+                stroke="rgba(91,142,248,0.4)"
+                stroke-width="1"
+                stroke-dasharray="4 3"
+                marker-end="url(#arrw)"
+              />
+              <text
+                x="32"
+                y="290"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#4a505e"
+              >
+                parent
+              </text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ENGINE -->
+    <section id="engine">
+      <div class="wrap">
+        <div class="section-label">03 — Evaluation Engine</div>
+        <h2>The core engine (D2)</h2>
+        <p>
+          The evaluation engine is a pure Python module with zero web framework
+          dependencies. It receives a <code>Mark</code>, a list of
+          <code>MarkRule</code> objects, and an <code>EvaluationContext</code> —
+          and returns a <code>bool | str</code>. The priority order is declared
+          as a constant, not buried in conditionals.
+        </p>
+
+        <!-- EVALUATION FLOW DIAGRAM -->
+        <div class="diagram-wrap">
+          <div class="diagram-header">
+            <div class="dot"></div>
+            <span>Evaluation priority — decision flow per request</span>
+          </div>
+          <div class="diagram-body">
+            <svg viewBox="0 0 800 520" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker
+                  id="fa"
+                  viewBox="0 0 10 10"
+                  refX="8"
+                  refY="5"
+                  markerWidth="6"
+                  markerHeight="6"
+                  orient="auto-start-reverse"
+                >
+                  <path
+                    d="M2 1L8 5L2 9"
+                    fill="none"
+                    stroke="context-stroke"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </marker>
+              </defs>
+
+              <!-- Input box -->
+              <rect
+                x="300"
+                y="20"
+                width="200"
+                height="50"
+                rx="8"
+                fill="rgba(91,142,248,0.12)"
+                stroke="rgba(91,142,248,0.35)"
+                stroke-width="0.5"
+              />
+              <text
+                x="400"
+                y="42"
+                text-anchor="middle"
+                font-family="'Sora'"
+                font-size="13"
+                font-weight="600"
+                fill="#c9d1e3"
+              >
+                EvaluationContext
+              </text>
+              <text
+                x="400"
+                y="60"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#4a505e"
+              >
+                user_id · org_id · plan · attributes
+              </text>
+
+              <!-- Kill switch check -->
+              <rect
+                x="300"
+                y="94"
+                width="200"
+                height="44"
+                rx="6"
+                fill="rgba(224,92,92,0.1)"
+                stroke="rgba(224,92,92,0.3)"
+                stroke-width="0.5"
+              />
+              <text
+                x="400"
+                y="116"
+                text-anchor="middle"
+                font-family="'Sora'"
+                font-size="12"
+                fill="#e05c5c"
+              >
+                mark.is_active?
+              </text>
+              <text
+                x="400"
+                y="130"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#4a505e"
+              >
+                kill switch check
+              </text>
+              <line
+                x1="400"
+                y1="70"
+                x2="400"
+                y2="92"
+                stroke="#5b8ef8"
+                stroke-width="1"
+                marker-end="url(#fa)"
+              />
+              <!-- false branch -->
+              <line
+                x1="500"
+                y1="116"
+                x2="560"
+                y2="116"
+                stroke="#e05c5c"
+                stroke-width="1"
+                marker-end="url(#fa)"
+              />
+              <rect
+                x="562"
+                y="100"
+                width="80"
+                height="32"
+                rx="6"
+                fill="rgba(224,92,92,0.12)"
+                stroke="rgba(224,92,92,0.3)"
+                stroke-width="0.5"
+              />
+              <text
+                x="602"
+                y="121"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#e05c5c"
+              >
+                → false
+              </text>
+              <text
+                x="530"
+                y="110"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#e05c5c"
+              >
+                inactive
+              </text>
+
+              <!-- Priority steps -->
+              <!-- Step 1: User -->
+              <rect
+                x="300"
+                y="162"
+                width="200"
+                height="52"
+                rx="6"
+                fill="rgba(61,214,140,0.08)"
+                stroke="rgba(61,214,140,0.25)"
+                stroke-width="0.5"
+              />
+              <text
+                x="330"
+                y="184"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#3dd68c"
+              >
+                ① USER RULE
+              </text>
+              <text
+                x="330"
+                y="202"
+                font-family="'Sora'"
+                font-size="12"
+                fill="#b0b8cc"
+              >
+                rule.rule_value == ctx.user_id?
+              </text>
+              <line
+                x1="400"
+                y1="138"
+                x2="400"
+                y2="160"
+                stroke="#5b8ef8"
+                stroke-width="1"
+                marker-end="url(#fa)"
+              />
+              <text
+                x="415"
+                y="152"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#3dd68c"
+              >
+                active
+              </text>
+              <!-- match branch -->
+              <line
+                x1="500"
+                y1="188"
+                x2="560"
+                y2="188"
+                stroke="#3dd68c"
+                stroke-width="1"
+                marker-end="url(#fa)"
+              />
+              <rect
+                x="562"
+                y="172"
+                width="100"
+                height="32"
+                rx="6"
+                fill="rgba(61,214,140,0.1)"
+                stroke="rgba(61,214,140,0.25)"
+                stroke-width="0.5"
+              />
+              <text
+                x="612"
+                y="193"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#3dd68c"
+              >
+                → variant
+              </text>
+              <text
+                x="525"
+                y="182"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#3dd68c"
+              >
+                match
+              </text>
+
+              <!-- Step 2: Org -->
+              <rect
+                x="300"
+                y="236"
+                width="200"
+                height="52"
+                rx="6"
+                fill="rgba(61,214,140,0.06)"
+                stroke="rgba(61,214,140,0.2)"
+                stroke-width="0.5"
+              />
+              <text
+                x="330"
+                y="258"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#3dd68c"
+              >
+                ② ORG RULE
+              </text>
+              <text
+                x="330"
+                y="276"
+                font-family="'Sora'"
+                font-size="12"
+                fill="#b0b8cc"
+              >
+                rule.rule_value == ctx.org_id?
+              </text>
+              <line
+                x1="400"
+                y1="214"
+                x2="400"
+                y2="234"
+                stroke="#5b8ef8"
+                stroke-width="1"
+                marker-end="url(#fa)"
+              />
+              <text
+                x="415"
+                y="228"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#4a505e"
+              >
+                no match
+              </text>
+              <line
+                x1="500"
+                y1="262"
+                x2="560"
+                y2="262"
+                stroke="#3dd68c"
+                stroke-width="1"
+                marker-end="url(#fa)"
+              />
+              <rect
+                x="562"
+                y="246"
+                width="100"
+                height="32"
+                rx="6"
+                fill="rgba(61,214,140,0.1)"
+                stroke="rgba(61,214,140,0.25)"
+                stroke-width="0.5"
+              />
+              <text
+                x="612"
+                y="267"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#3dd68c"
+              >
+                → variant
+              </text>
+              <text
+                x="525"
+                y="256"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#3dd68c"
+              >
+                match
+              </text>
+
+              <!-- Step 3: Plan -->
+              <rect
+                x="300"
+                y="310"
+                width="200"
+                height="52"
+                rx="6"
+                fill="rgba(61,214,140,0.04)"
+                stroke="rgba(61,214,140,0.15)"
+                stroke-width="0.5"
+              />
+              <text
+                x="330"
+                y="332"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#3dd68c"
+              >
+                ③ PLAN RULE
+              </text>
+              <text
+                x="330"
+                y="350"
+                font-family="'Sora'"
+                font-size="12"
+                fill="#b0b8cc"
+              >
+                rule.rule_value == ctx.plan?
+              </text>
+              <line
+                x1="400"
+                y1="288"
+                x2="400"
+                y2="308"
+                stroke="#5b8ef8"
+                stroke-width="1"
+                marker-end="url(#fa)"
+              />
+              <text
+                x="415"
+                y="302"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#4a505e"
+              >
+                no match
+              </text>
+              <line
+                x1="500"
+                y1="336"
+                x2="560"
+                y2="336"
+                stroke="#3dd68c"
+                stroke-width="1"
+                marker-end="url(#fa)"
+              />
+              <rect
+                x="562"
+                y="320"
+                width="100"
+                height="32"
+                rx="6"
+                fill="rgba(61,214,140,0.1)"
+                stroke="rgba(61,214,140,0.25)"
+                stroke-width="0.5"
+              />
+              <text
+                x="612"
+                y="341"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#3dd68c"
+              >
+                → variant
+              </text>
+              <text
+                x="525"
+                y="330"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#3dd68c"
+              >
+                match
+              </text>
+
+              <!-- Step 4: Percentage -->
+              <rect
+                x="300"
+                y="384"
+                width="200"
+                height="52"
+                rx="6"
+                fill="rgba(167,139,250,0.07)"
+                stroke="rgba(167,139,250,0.2)"
+                stroke-width="0.5"
+              />
+              <text
+                x="330"
+                y="406"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#a78bfa"
+              >
+                ④ PERCENTAGE
+              </text>
+              <text
+                x="330"
+                y="424"
+                font-family="'Sora'"
+                font-size="12"
+                fill="#b0b8cc"
+              >
+                md5(user_id) % 100 &lt; N?
+              </text>
+              <line
+                x1="400"
+                y1="362"
+                x2="400"
+                y2="382"
+                stroke="#5b8ef8"
+                stroke-width="1"
+                marker-end="url(#fa)"
+              />
+              <text
+                x="415"
+                y="376"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#4a505e"
+              >
+                no match
+              </text>
+              <line
+                x1="500"
+                y1="410"
+                x2="560"
+                y2="410"
+                stroke="#a78bfa"
+                stroke-width="1"
+                marker-end="url(#fa)"
+              />
+              <rect
+                x="562"
+                y="394"
+                width="100"
+                height="32"
+                rx="6"
+                fill="rgba(167,139,250,0.1)"
+                stroke="rgba(167,139,250,0.25)"
+                stroke-width="0.5"
+              />
+              <text
+                x="612"
+                y="415"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#a78bfa"
+              >
+                → true
+              </text>
+              <text
+                x="525"
+                y="404"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#a78bfa"
+              >
+                in bucket
+              </text>
+
+              <!-- Step 5: Default -->
+              <rect
+                x="300"
+                y="456"
+                width="200"
+                height="44"
+                rx="6"
+                fill="rgba(122,128,144,0.1)"
+                stroke="rgba(122,128,144,0.25)"
+                stroke-width="0.5"
+              />
+              <text
+                x="330"
+                y="478"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#7a8090"
+              >
+                ⑤ DEFAULT
+              </text>
+              <text
+                x="330"
+                y="492"
+                font-family="'Sora'"
+                font-size="12"
+                fill="#b0b8cc"
+              >
+                mark.default_value
+              </text>
+              <line
+                x1="400"
+                y1="436"
+                x2="400"
+                y2="454"
+                stroke="#5b8ef8"
+                stroke-width="1"
+                marker-end="url(#fa)"
+              />
+              <text
+                x="415"
+                y="449"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#4a505e"
+              >
+                no match
+              </text>
+            </svg>
+          </div>
+        </div>
+
+        <p>
+          Each rule type also supports an optional
+          <code>percentage</code> sub-rollout column — enabling intersectional
+          logic like "50% of Org A" without building a full AST parser.
+        </p>
+
+        <div class="code-block">
+          <pre><span class="cm"># constants.py — priority is a first-class constant, not implicit logic</span>
+<span class="kw">RULE_PRIORITY</span> = [
+    <span class="str">"user"</span>,        <span class="cm"># most specific — canary releases, QA targeting</span>
+    <span class="str">"org"</span>,         <span class="cm"># multi-tenant isolation</span>
+    <span class="str">"plan"</span>,        <span class="cm"># subscription-tier gating</span>
+    <span class="str">"attribute"</span>,   <span class="cm"># flexible JSON subset matching</span>
+    <span class="str">"percentage"</span>,  <span class="cm"># deterministic A/B rollout</span>
+    <span class="str">"default"</span>      <span class="cm"># safety net fallback</span>
+]</pre>
+        </div>
+
+        <h3>Deterministic percentage rollout</h3>
+        <p>
+          Rather than storing per-user bucket assignments (which would scale to
+          millions of rows), the engine uses a stateless hash function. The same
+          <code>user_id</code> string always hashes to the same bucket —
+          guaranteeing sticky assignment with zero state management.
+        </p>
+
+        <div class="diagram-wrap">
+          <div class="diagram-header">
+            <div class="dot"></div>
+            <span>MD5 hash rollout — why it is deterministic</span>
+          </div>
+          <div class="diagram-body">
+            <svg viewBox="0 0 800 200" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker
+                  id="faa"
+                  viewBox="0 0 10 10"
+                  refX="8"
+                  refY="5"
+                  markerWidth="6"
+                  markerHeight="6"
+                  orient="auto-start-reverse"
+                >
+                  <path
+                    d="M2 1L8 5L2 9"
+                    fill="none"
+                    stroke="context-stroke"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </marker>
+              </defs>
+
+              <!-- user_id -->
+              <rect
+                x="30"
+                y="74"
+                width="120"
+                height="52"
+                rx="8"
+                fill="rgba(91,142,248,0.1)"
+                stroke="rgba(91,142,248,0.3)"
+                stroke-width="0.5"
+              />
+              <text
+                x="90"
+                y="96"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#5b8ef8"
+              >
+                user_id
+              </text>
+              <text
+                x="90"
+                y="116"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="12"
+                fill="#c9d1e3"
+              >
+                "alice"
+              </text>
+
+              <line
+                x1="150"
+                y1="100"
+                x2="198"
+                y2="100"
+                stroke="#5b8ef8"
+                stroke-width="1"
+                marker-end="url(#faa)"
+              />
+
+              <!-- md5 -->
+              <rect
+                x="200"
+                y="68"
+                width="160"
+                height="64"
+                rx="8"
+                fill="rgba(167,139,250,0.1)"
+                stroke="rgba(167,139,250,0.3)"
+                stroke-width="0.5"
+              />
+              <text
+                x="280"
+                y="90"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#a78bfa"
+              >
+                hashlib.md5( )
+              </text>
+              <text
+                x="280"
+                y="108"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="12"
+                fill="#c9d1e3"
+              >
+                hexdigest, 16
+              </text>
+              <text
+                x="280"
+                y="124"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#4a505e"
+              >
+                always same result
+              </text>
+
+              <line
+                x1="360"
+                y1="100"
+                x2="408"
+                y2="100"
+                stroke="#a78bfa"
+                stroke-width="1"
+                marker-end="url(#faa)"
+              />
+              <text
+                x="380"
+                y="90"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#4a505e"
+              >
+                % 100
+              </text>
+
+              <!-- bucket -->
+              <rect
+                x="410"
+                y="68"
+                width="100"
+                height="64"
+                rx="8"
+                fill="rgba(61,214,140,0.1)"
+                stroke="rgba(61,214,140,0.25)"
+                stroke-width="0.5"
+              />
+              <text
+                x="460"
+                y="90"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#3dd68c"
+              >
+                bucket
+              </text>
+              <text
+                x="460"
+                y="112"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="22"
+                font-weight="600"
+                fill="#3dd68c"
+              >
+                37
+              </text>
+
+              <line
+                x1="510"
+                y1="100"
+                x2="558"
+                y2="100"
+                stroke="#3dd68c"
+                stroke-width="1"
+                marker-end="url(#faa)"
+              />
+              <text
+                x="530"
+                y="90"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#4a505e"
+              >
+                &lt; 50?
+              </text>
+
+              <!-- result -->
+              <rect
+                x="560"
+                y="68"
+                width="100"
+                height="64"
+                rx="8"
+                fill="rgba(61,214,140,0.12)"
+                stroke="rgba(61,214,140,0.3)"
+                stroke-width="0.5"
+              />
+              <text
+                x="610"
+                y="96"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="14"
+                fill="#3dd68c"
+              >
+                true
+              </text>
+              <text
+                x="610"
+                y="116"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#4a505e"
+              >
+                always, every request
+              </text>
+
+              <!-- labels -->
+              <text
+                x="400"
+                y="166"
+                text-anchor="middle"
+                font-family="'Sora'"
+                font-size="13"
+                fill="#7a8090"
+              >
+                Same input string → same hash → same bucket → same result. No
+                database needed.
+              </text>
+              <text
+                x="400"
+                y="184"
+                text-anchor="middle"
+                font-family="'Sora'"
+                font-size="13"
+                fill="#5a606e"
+              >
+                Distributes uniformly across large user populations via MD5's
+                avalanche property.
+              </text>
+            </svg>
+          </div>
+        </div>
+
+        <h3>TTL cache in MarkClient</h3>
+        <p>
+          The <code>MarkClient</code> wraps the engine with a 60-second
+          in-process <code>TTLCache</code>. Every database read is gated behind
+          a cache key of the form <code>mark_data:&lt;key&gt;</code>. The cache
+          is explicitly invalidated on any admin mutation, and fully cleared on
+          cascading operations.
+        </p>
+
+        <div class="callout green">
+          <p>
+            The engine module has <strong>zero imports</strong> from FastAPI,
+            SQLAlchemy, or any HTTP library. It takes plain Python objects and
+            returns a plain value — making it independently testable without a
+            running server, exactly as required by the spec.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- API -->
+    <section id="api">
+      <div class="wrap">
+        <div class="section-label">04 — API Layer (D1)</div>
+        <h2>Evaluation &amp; admin API</h2>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Method</th>
+                <th>Endpoint</th>
+                <th>Auth</th>
+                <th>Purpose</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>POST</code></td>
+                <td><code>/api/v1/marks/evaluate</code></td>
+                <td>None (public)</td>
+                <td>
+                  Batch evaluate N marks for a context. Returns
+                  <code>{ "key": bool }</code> map. Silent-fails to empty object
+                  on error.
+                </td>
+              </tr>
+              <tr>
+                <td><code>GET</code></td>
+                <td><code>/admin/marks</code></td>
+                <td>x-admin-token</td>
+                <td>
+                  List all marks with type, state, rule count, parent_id, tags.
+                </td>
+              </tr>
+              <tr>
+                <td><code>POST</code></td>
+                <td><code>/admin/marks</code></td>
+                <td>x-admin-token</td>
+                <td>
+                  Create a new mark with key, type, default_value, optional
+                  parent_id, tags.
+                </td>
+              </tr>
+              <tr>
+                <td><code>PATCH</code></td>
+                <td><code>/admin/marks/{id}</code></td>
+                <td>x-admin-token</td>
+                <td>
+                  Toggle is_active (with optional cascade), update parent, tags,
+                  default. Writes audit log.
+                </td>
+              </tr>
+              <tr>
+                <td><code>POST</code></td>
+                <td><code>/admin/marks/{id}/rules</code></td>
+                <td>x-admin-token</td>
+                <td>
+                  Add a targeting rule. Prevents duplicate identical rules.
+                </td>
+              </tr>
+              <tr>
+                <td><code>PUT</code></td>
+                <td><code>/admin/marks/{id}/rules/bulk</code></td>
+                <td>x-admin-token</td>
+                <td>
+                  Transactional sync of all rules — diffs existing vs incoming,
+                  creates/updates/deletes in one commit.
+                </td>
+              </tr>
+              <tr>
+                <td><code>DELETE</code></td>
+                <td><code>/admin/marks/{id}/rules/{rule_id}</code></td>
+                <td>x-admin-token</td>
+                <td>Remove a single rule.</td>
+              </tr>
+              <tr>
+                <td><code>GET</code></td>
+                <td><code>/admin/marks/{id}/audit_logs</code></td>
+                <td>x-admin-token</td>
+                <td>
+                  Last 50 audit entries for a mark, descending by timestamp.
+                </td>
+              </tr>
+              <tr>
+                <td><code>DELETE</code></td>
+                <td><code>/admin/marks/{id}</code></td>
+                <td>x-admin-token</td>
+                <td>Delete mark (blocked if children exist).</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Evaluate request shape</h3>
+        <div class="code-block">
+          <pre><span class="cm"># POST /api/v1/marks/evaluate</span>
+{
+  <span class="str">"user_id"</span>: <span class="str">"user_1"</span>,
+  <span class="str">"org_id"</span>:  <span class="str">"org_a"</span>,
+  <span class="str">"plan"</span>:    <span class="str">"pro"</span>,
+  <span class="str">"attributes"</span>: { <span class="str">"country"</span>: <span class="str">"US"</span>, <span class="str">"device"</span>: <span class="str">"mobile"</span> },
+  <span class="str">"mark_keys"</span>: [<span class="str">"new-dashboard"</span>, <span class="str">"billing-kill-switch"</span>],
+  <span class="str">"tags"</span>:      [<span class="str">"dashboard"</span>, <span class="str">"experiment"</span>] <span class="cm">// resolves all marks with these tags</span>
+}
+
+<span class="cm"># Response — all requested marks in one round-trip</span>
+{
+  <span class="str">"new-dashboard"</span>:       <span class="kw">true</span>,
+  <span class="str">"billing-kill-switch"</span>: <span class="kw">true</span>,
+  <span class="str">"beta-feature"</span>:        <span class="kw">false</span>
+}</pre>
+        </div>
+
+        <h3>Silent degradation</h3>
+        <p>
+          The evaluate endpoint wraps its entire body in a
+          <code>try/except</code>. Any unhandled exception returns an empty
+          <code>{}</code> dict — the frontend then falls back to its
+          <code>localStorage</code> cache or hardcoded
+          <code>defaultValue</code>. The mark service going down is a silent
+          degradation, never an application crash.
+        </p>
+
+        <h3>Hierarchical kill switches with cascade</h3>
+        <p>
+          Parent-child relationships are expressed through the
+          <code>parent_id</code> foreign key on <code>marks</code>. When an
+          operator toggles a parent's <code>is_active</code> with
+          <code>cascade: true</code>, the backend recursively walks the tree and
+          physically updates all children's <code>is_active</code> column. The
+          cache is fully cleared afterward.
+        </p>
+
+        <div class="callout amber">
+          <p>
+            <strong>Design choice:</strong> Cascading updates the database state
+            rather than dynamically evaluating parent rules at runtime. This
+            keeps mark state predictable — a product manager can look at any
+            toggle in the admin console and know its exact state without
+            reasoning about parent rule logic.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FRONTEND -->
+    <section id="frontend">
+      <div class="wrap">
+        <div class="section-label">05 — Frontend (D3)</div>
+        <h2>React context provider &amp; hook</h2>
+
+        <div class="diagram-wrap">
+          <div class="diagram-header">
+            <div class="dot"></div>
+            <span
+              >MarkProvider lifecycle — single fetch, zero-latency hook
+              reads</span
+            >
+          </div>
+          <div class="diagram-body">
+            <svg viewBox="0 0 800 240" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker
+                  id="fb"
+                  viewBox="0 0 10 10"
+                  refX="8"
+                  refY="5"
+                  markerWidth="6"
+                  markerHeight="6"
+                  orient="auto-start-reverse"
+                >
+                  <path
+                    d="M2 1L8 5L2 9"
+                    fill="none"
+                    stroke="context-stroke"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </marker>
+              </defs>
+
+              <!-- App boot -->
+              <rect
+                x="20"
+                y="88"
+                width="120"
+                height="64"
+                rx="8"
+                fill="rgba(91,142,248,0.1)"
+                stroke="rgba(91,142,248,0.3)"
+                stroke-width="0.5"
+              />
+              <text
+                x="80"
+                y="112"
+                text-anchor="middle"
+                font-family="'Sora'"
+                font-size="12"
+                fill="#c9d1e3"
+              >
+                App boot
+              </text>
+              <text
+                x="80"
+                y="132"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#4a505e"
+              >
+                layout.tsx
+              </text>
+              <text
+                x="80"
+                y="148"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#4a505e"
+              >
+                wraps all pages
+              </text>
+
+              <line
+                x1="140"
+                y1="120"
+                x2="188"
+                y2="120"
+                stroke="#5b8ef8"
+                stroke-width="1"
+                marker-end="url(#fb)"
+              />
+
+              <!-- MarkProvider -->
+              <rect
+                x="190"
+                y="60"
+                width="150"
+                height="120"
+                rx="8"
+                fill="rgba(61,214,140,0.07)"
+                stroke="rgba(61,214,140,0.25)"
+                stroke-width="0.5"
+              />
+              <text
+                x="265"
+                y="84"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#3dd68c"
+              >
+                MarkProvider
+              </text>
+              <text
+                x="265"
+                y="104"
+                text-anchor="middle"
+                font-family="'Sora'"
+                font-size="12"
+                fill="#b0b8cc"
+              >
+                POST /evaluate
+              </text>
+              <text
+                x="265"
+                y="122"
+                text-anchor="middle"
+                font-family="'Sora'"
+                font-size="12"
+                fill="#b0b8cc"
+              >
+                1 request / context
+              </text>
+              <text
+                x="265"
+                y="142"
+                text-anchor="middle"
+                font-family="'Sora'"
+                font-size="12"
+                fill="#b0b8cc"
+              >
+                stores in React ctx
+              </text>
+              <text
+                x="265"
+                y="162"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#4a505e"
+              >
+                + localStorage write
+              </text>
+
+              <!-- success / failure branches -->
+              <line
+                x1="340"
+                y1="100"
+                x2="388"
+                y2="80"
+                stroke="#3dd68c"
+                stroke-width="1"
+                marker-end="url(#fb)"
+              />
+              <text
+                x="360"
+                y="85"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#3dd68c"
+              >
+                online
+              </text>
+
+              <line
+                x1="340"
+                y1="140"
+                x2="388"
+                y2="160"
+                stroke="#e05c5c"
+                stroke-width="1"
+                marker-end="url(#fb)"
+              />
+              <text
+                x="356"
+                y="160"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#e05c5c"
+              >
+                offline
+              </text>
+
+              <!-- Fresh data -->
+              <rect
+                x="390"
+                y="54"
+                width="140"
+                height="52"
+                rx="8"
+                fill="rgba(61,214,140,0.07)"
+                stroke="rgba(61,214,140,0.2)"
+                stroke-width="0.5"
+              />
+              <text
+                x="460"
+                y="76"
+                text-anchor="middle"
+                font-family="'Sora'"
+                font-size="12"
+                fill="#c9d1e3"
+              >
+                Fresh marks
+              </text>
+              <text
+                x="460"
+                y="96"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#3dd68c"
+              >
+                → React Context
+              </text>
+
+              <!-- Cache fallback -->
+              <rect
+                x="390"
+                y="132"
+                width="140"
+                height="52"
+                rx="8"
+                fill="rgba(245,166,35,0.07)"
+                stroke="rgba(245,166,35,0.2)"
+                stroke-width="0.5"
+              />
+              <text
+                x="460"
+                y="154"
+                text-anchor="middle"
+                font-family="'Sora'"
+                font-size="12"
+                fill="#c9d1e3"
+              >
+                localStorage cache
+              </text>
+              <text
+                x="460"
+                y="174"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#f5a623"
+              >
+                → serve stale
+              </text>
+
+              <!-- useMark hook -->
+              <line
+                x1="530"
+                y1="80"
+                x2="578"
+                y2="120"
+                stroke="#3dd68c"
+                stroke-width="1"
+                marker-end="url(#fb)"
+              />
+              <line
+                x1="530"
+                y1="158"
+                x2="578"
+                y2="140"
+                stroke="#f5a623"
+                stroke-width="1"
+                marker-end="url(#fb)"
+              />
+
+              <rect
+                x="580"
+                y="88"
+                width="150"
+                height="64"
+                rx="8"
+                fill="rgba(91,142,248,0.07)"
+                stroke="rgba(91,142,248,0.25)"
+                stroke-width="0.5"
+              />
+              <text
+                x="655"
+                y="112"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#5b8ef8"
+              >
+                useMark("key", false)
+              </text>
+              <text
+                x="655"
+                y="132"
+                text-anchor="middle"
+                font-family="'Sora'"
+                font-size="12"
+                fill="#b0b8cc"
+              >
+                reads from ctx memory
+              </text>
+              <text
+                x="655"
+                y="148"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#4a505e"
+              >
+                0ms latency
+              </text>
+            </svg>
+          </div>
+        </div>
+
+        <h3>useMark hook</h3>
+        <p>
+          Any component calls
+          <code>useMark("feature-key", defaultValue)</code> — it reads from the
+          in-memory React Context with zero network overhead. If the key is not
+          in the context (service was down), it falls back to the provided
+          <code>defaultValue</code>.
+        </p>
+
+        <div class="code-block">
+          <pre><span class="cm">// Three gated components from page.tsx</span>
+
+<span class="cm">// 1. Release mark — org-targeted</span>
+<span class="kw">const</span> newDashboard = <span class="fn">useMark</span>(<span class="str">"new-dashboard"</span>, <span class="kw">false</span>);
+
+<span class="cm">// 2. Kill switch</span>
+<span class="kw">const</span> billingEnabled = <span class="fn">useMark</span>(<span class="str">"billing-kill-switch"</span>, <span class="kw">true</span>);
+
+<span class="cm">// 3. A/B experiment</span>
+<span class="kw">const</span> betaFeature = <span class="fn">useMark</span>(<span class="str">"beta-feature"</span>, <span class="kw">false</span>);
+
+<span class="cm">// The provider loads all tags in one request at layout level:</span>
+&lt;MarkProvider tags={[<span class="str">"dashboard"</span>, <span class="str">"experiment"</span>, <span class="str">"billing"</span>, <span class="str">"checkout"</span>]}&gt;</pre>
+        </div>
+
+        <p>
+          The <code>MarkProvider</code> also accepts a
+          <code>setContext</code> function, enabling the demo page's live
+          context switcher — users can change <code>user_id</code>,
+          <code>org_id</code>, and <code>plan</code> to watch mark evaluations
+          update in real-time.
+        </p>
+      </div>
+    </section>
+
+    <!-- ADMIN -->
+    <section id="admin">
+      <div class="wrap">
+        <div class="section-label">06 — Admin Console (D4)</div>
+        <h2>Operator interface</h2>
+        <p>
+          The Admin Console is a high-density single-page app at
+          <code>/admin</code>. It follows a file-explorer pattern: a left
+          sidebar (mark registry tree) and a right detail pane.
+        </p>
+
+        <div class="card-grid">
+          <div class="card">
+            <div class="card-icon">🌲</div>
+            <h4>Hierarchical tree sidebar</h4>
+            <p>
+              Marks are displayed as an expandable tree, reflecting their
+              parent-child relationships via <code>TreeItem</code> recursion.
+            </p>
+          </div>
+          <div class="card">
+            <div class="card-icon">📝</div>
+            <h4>Draft-based editing</h4>
+            <p>
+              All changes are accumulated in <code>draftRules</code> and
+              <code>draft</code> state. A single "Save Rules" call sends a
+              <code>PUT /rules/bulk</code> transaction — no network request per
+              keystroke.
+            </p>
+          </div>
+          <div class="card">
+            <div class="card-icon">⚡</div>
+            <h4>One-click kill switch</h4>
+            <p>
+              Toggle in the header bar flips <code>is_active</code> in a single
+              <code>PATCH</code> call. No confirmation dialog — speed is the
+              point during an incident.
+            </p>
+          </div>
+          <div class="card">
+            <div class="card-icon">📜</div>
+            <h4>Audit log timeline</h4>
+            <p>
+              Right column shows the last 50 audit entries per mark with action,
+              actor, and timestamp as a visual timeline.
+            </p>
+          </div>
+        </div>
+
+        <h3>Bulk rule sync design</h3>
+        <p>
+          Rather than calling the API on every rule change, the frontend
+          maintains a <code>draftRules</code> array in local state. When "Save
+          Rules" is clicked, a single
+          <code>PUT /admin/marks/{id}/rules/bulk</code> call diffs the full rule
+          list against the database — creating new rules, updating changed ones,
+          and deleting removed ones, all in one database transaction.
+        </p>
+
+        <div class="callout">
+          <p>
+            New rules added locally are assigned a
+            <code>temp-{timestamp}</code> ID. The bulk endpoint detects these by
+            the <code>temp-</code> prefix and creates them as new rows, while
+            numeric IDs trigger updates.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHALLENGES -->
+    <section id="challenges">
+      <div class="wrap">
+        <div class="section-label">07 — Engineering Decisions</div>
+        <h2>Challenges &amp; solutions</h2>
+
+        <h3>Challenge 1 — OR vs AND targeting (Intersectional sub-rollouts)</h3>
+        <p>
+          Early designs treated all rules as an OR list. An org match would
+          immediately grant access, bypassing percentage rollout rules entirely.
+          This made "50% of Org A" impossible to express.
+        </p>
+
+        <div class="diagram-wrap">
+          <div class="diagram-header">
+            <div class="dot"></div>
+            <span>Sub-rollout — how "50% of Org A" is modelled</span>
+          </div>
+          <div class="diagram-body">
+            <svg viewBox="0 0 800 200" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker
+                  id="fc"
+                  viewBox="0 0 10 10"
+                  refX="8"
+                  refY="5"
+                  markerWidth="6"
+                  markerHeight="6"
+                  orient="auto-start-reverse"
+                >
+                  <path
+                    d="M2 1L8 5L2 9"
+                    fill="none"
+                    stroke="context-stroke"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </marker>
+              </defs>
+
+              <!-- Org rule match -->
+              <rect
+                x="30"
+                y="74"
+                width="160"
+                height="52"
+                rx="8"
+                fill="rgba(61,214,140,0.07)"
+                stroke="rgba(61,214,140,0.2)"
+                stroke-width="0.5"
+              />
+              <text
+                x="110"
+                y="96"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#3dd68c"
+              >
+                ORG RULE
+              </text>
+              <text
+                x="110"
+                y="114"
+                text-anchor="middle"
+                font-family="'Sora'"
+                font-size="12"
+                fill="#b0b8cc"
+              >
+                rule_value == "org_a"
+              </text>
+              <text
+                x="110"
+                y="146"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#4a505e"
+              >
+                + percentage = 50
+              </text>
+
+              <line
+                x1="190"
+                y1="100"
+                x2="248"
+                y2="100"
+                stroke="#3dd68c"
+                stroke-width="1"
+                marker-end="url(#fc)"
+              />
+              <text
+                x="218"
+                y="92"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#3dd68c"
+              >
+                match
+              </text>
+
+              <!-- Sub-rollout check -->
+              <rect
+                x="250"
+                y="68"
+                width="180"
+                height="64"
+                rx="8"
+                fill="rgba(167,139,250,0.07)"
+                stroke="rgba(167,139,250,0.25)"
+                stroke-width="0.5"
+              />
+              <text
+                x="340"
+                y="92"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#a78bfa"
+              >
+                sub-rollout check
+              </text>
+              <text
+                x="340"
+                y="112"
+                text-anchor="middle"
+                font-family="'Sora'"
+                font-size="12"
+                fill="#b0b8cc"
+              >
+                md5(user_id) % 100 &lt; 50?
+              </text>
+              <text
+                x="340"
+                y="128"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#4a505e"
+              >
+                only applied to users who matched
+              </text>
+
+              <!-- True branch -->
+              <line
+                x1="430"
+                y1="86"
+                x2="498"
+                y2="80"
+                stroke="#3dd68c"
+                stroke-width="1"
+                marker-end="url(#fc)"
+              />
+              <text
+                x="458"
+                y="78"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#3dd68c"
+              >
+                in bucket
+              </text>
+              <rect
+                x="500"
+                y="60"
+                width="80"
+                height="40"
+                rx="6"
+                fill="rgba(61,214,140,0.1)"
+                stroke="rgba(61,214,140,0.25)"
+                stroke-width="0.5"
+              />
+              <text
+                x="540"
+                y="84"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="12"
+                fill="#3dd68c"
+              >
+                true
+              </text>
+
+              <!-- False branch -->
+              <line
+                x1="430"
+                y1="114"
+                x2="498"
+                y2="120"
+                stroke="#e05c5c"
+                stroke-width="1"
+                marker-end="url(#fc)"
+              />
+              <text
+                x="458"
+                y="130"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#e05c5c"
+              >
+                out of bucket
+              </text>
+              <rect
+                x="500"
+                y="100"
+                width="80"
+                height="40"
+                rx="6"
+                fill="rgba(224,92,92,0.08)"
+                stroke="rgba(224,92,92,0.2)"
+                stroke-width="0.5"
+              />
+              <text
+                x="540"
+                y="124"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="12"
+                fill="#e05c5c"
+              >
+                continue
+              </text>
+
+              <text
+                x="400"
+                y="178"
+                text-anchor="middle"
+                font-family="'Sora'"
+                font-size="13"
+                fill="#5a606e"
+              >
+                The percentage column on every rule type enables intersectional
+                targeting without an AST engine.
+              </text>
+            </svg>
+          </div>
+        </div>
+
+        <p>
+          <strong>Tradeoff:</strong> This provides ~90% of the flexibility of a
+          full AST expression engine at 1% of the latency cost. An AST parser
+          would increase evaluation from ~2ms to ~20ms+ — unacceptable for a
+          service called on every page load.
+        </p>
+
+        <div class="divider"></div>
+
+        <h3>Challenge 2 — Hierarchical kill switch design</h3>
+        <p>
+          The initial approach recursively evaluated parent rule chains at
+          runtime. This had a critical flaw: a parent with
+          <em>no rules</em> defaulted to <code>false</code>, which silently
+          killed all children even when those children had active targeting
+          rules.
+        </p>
+
+        <p>
+          <strong>Solution:</strong> Hierarchy cascade is
+          <em>explicit state</em>, not runtime evaluation. When an operator
+          toggles a parent with <code>cascade: true</code>, the backend
+          physically writes <code>is_active = false</code> to all children. The
+          state is what the database says it is — no inference required.
+        </p>
+
+        <div class="diagram-wrap">
+          <div class="diagram-header">
+            <div class="dot"></div>
+            <span
+              >Parent → child cascade — physical state, not dynamic
+              evaluation</span
+            >
+          </div>
+          <div class="diagram-body">
+            <svg viewBox="0 0 800 200" xmlns="http://www.w3.org/2000/svg">
+              <!-- Parent -->
+              <rect
+                x="280"
+                y="20"
+                width="240"
+                height="52"
+                rx="8"
+                fill="rgba(224,92,92,0.08)"
+                stroke="rgba(224,92,92,0.25)"
+                stroke-width="0.5"
+              />
+              <text
+                x="400"
+                y="42"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#e05c5c"
+              >
+                checkout-system
+              </text>
+              <text
+                x="400"
+                y="60"
+                text-anchor="middle"
+                font-family="'Sora'"
+                font-size="12"
+                fill="#b0b8cc"
+              >
+                is_active: false (toggled off)
+              </text>
+
+              <!-- Children -->
+              <line
+                x1="320"
+                y1="72"
+                x2="180"
+                y2="118"
+                stroke="rgba(224,92,92,0.4)"
+                stroke-width="1"
+              />
+              <line
+                x1="400"
+                y1="72"
+                x2="400"
+                y2="118"
+                stroke="rgba(224,92,92,0.4)"
+                stroke-width="1"
+              />
+              <line
+                x1="480"
+                y1="72"
+                x2="620"
+                y2="118"
+                stroke="rgba(224,92,92,0.4)"
+                stroke-width="1"
+              />
+
+              <rect
+                x="80"
+                y="120"
+                width="200"
+                height="44"
+                rx="8"
+                fill="rgba(224,92,92,0.06)"
+                stroke="rgba(224,92,92,0.2)"
+                stroke-width="0.5"
+              />
+              <text
+                x="180"
+                y="140"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#e05c5c"
+              >
+                checkout-v2-ui
+              </text>
+              <text
+                x="180"
+                y="156"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#4a505e"
+              >
+                is_active: false ← written to DB
+              </text>
+
+              <rect
+                x="300"
+                y="120"
+                width="200"
+                height="44"
+                rx="8"
+                fill="rgba(224,92,92,0.06)"
+                stroke="rgba(224,92,92,0.2)"
+                stroke-width="0.5"
+              />
+              <text
+                x="400"
+                y="140"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#e05c5c"
+              >
+                checkout-stripe-v3
+              </text>
+              <text
+                x="400"
+                y="156"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#4a505e"
+              >
+                is_active: false ← written to DB
+              </text>
+
+              <rect
+                x="520"
+                y="120"
+                width="200"
+                height="44"
+                rx="8"
+                fill="rgba(224,92,92,0.06)"
+                stroke="rgba(224,92,92,0.2)"
+                stroke-width="0.5"
+              />
+              <text
+                x="620"
+                y="140"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="11"
+                fill="#e05c5c"
+              >
+                checkout-analytics
+              </text>
+              <text
+                x="620"
+                y="156"
+                text-anchor="middle"
+                font-family="'IBM Plex Mono'"
+                font-size="10"
+                fill="#4a505e"
+              >
+                is_active: false ← written to DB
+              </text>
+
+              <text
+                x="400"
+                y="190"
+                text-anchor="middle"
+                font-family="'Sora'"
+                font-size="13"
+                fill="#5a606e"
+              >
+                State is predictable — operators can look at any toggle and know
+                exactly what it means without reasoning about parent rules.
+              </text>
+            </svg>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <h3>Challenge 3 — Decoupling identity validation</h3>
+        <p>
+          Early versions queried the <code>memberships</code> table on every
+          <code>/evaluate</code> call to verify the
+          <code>user_id</code> belonged to the <code>org_id</code>. This created
+          two problems: it hit the database on every flag evaluation, and it
+          tightly coupled the Control Plane to the application's membership
+          business logic.
+        </p>
+
+        <p>
+          <strong>Solution adopted:</strong> The evaluation engine now trusts
+          the <code>EvaluationContext</code> payload it receives. Authentication
+          and authorization must happen <em>before</em> the feature flag call —
+          in the application's own auth middleware. The Control Plane becomes a
+          stateless calculator that any service can call without being coupled
+          to its user model.
+        </p>
+
+        <div class="callout amber">
+          <p>
+            <strong>Known tradeoff:</strong> This means a crafted request with
+            <code>org_id: "org_a"</code> from a user who is not a member of
+            <code>org_a</code> could evaluate org-targeted flags correctly. The
+            spec acknowledges this and places the enforcement responsibility
+            upstream. The membership table and the commented-out validation code
+            remain in the codebase for operators who want to re-enable it.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- DESIGN QUESTIONS -->
+    <section id="questions">
+      <div class="wrap">
+        <div class="section-label">08 — Design Questions</div>
+        <h2>Q&amp;A</h2>
+
+        <div class="qa-block">
+          <div class="qa-q">
+            <p>
+              Q1 — A mark is enabled for Org A but disabled globally. What does
+              a user in Org A see? What does a user in no targeted org see?
+            </p>
+          </div>
+          <div class="qa-a">
+            <p>
+              The engine evaluates rules in priority order. For a user in Org A,
+              it reaches step ② (ORG RULE) and finds a matching rule with
+              <code>rule_value == "org_a"</code> and no sub-rollout. It
+              immediately returns <code>true</code> — the global default is
+              never reached.
+            </p>
+            <p>
+              For a user in no targeted org, the engine steps through User → Org
+              → Plan → Attribute → Percentage checks. Finding no matching rule,
+              it falls to step ⑤ and returns <code>mark.default_value</code> —
+              which in this case is <code>false</code> ("disabled globally").
+              The org rule's <code>true</code> result was scoped to org_a's
+              users only.
+            </p>
+          </div>
+        </div>
+
+        <div class="qa-block">
+          <div class="qa-q">
+            <p>
+              Q2 — User X and User Y are both in Org A with a 50% rollout. Can
+              they see different values?
+            </p>
+          </div>
+          <div class="qa-a">
+            <p>
+              Yes, and this is by design. The hash function operates on
+              <code>user_id</code>, not <code>org_id</code>. User X and User Y
+              may hash to different buckets (e.g. bucket 37 and bucket 62) — one
+              falls below the 50% threshold and gets <code>true</code>, the
+              other does not.
+            </p>
+            <p>
+              <strong>Per-user consistency is the correct default.</strong> In
+              A/B testing, the goal is to split individuals, not organizations.
+              Splitting by org would mean an entire org sees one variant,
+              collapsing the experiment sample size and introducing
+              organizational confounders. Per-user hashing guarantees that each
+              individual's experience is sticky across sessions, days, and
+              requests — without any stored state.
+            </p>
+          </div>
+        </div>
+
+        <div class="qa-block">
+          <div class="qa-q">
+            <p>
+              Q3 — How do you enable a mark for every Pro plan user across all
+              orgs, without adding one rule per org?
+            </p>
+          </div>
+          <div class="qa-a">
+            <p>
+              Add a single rule with <code>rule_type = "plan"</code> and
+              <code>rule_value = "pro"</code>. The <code>mark_rules</code> table
+              stores rule type as a discriminator column — a plan rule is not
+              scoped to any org. When the engine reaches step ③ (PLAN RULE), it
+              checks <code>rule.rule_value == ctx.plan</code>. Any user whose
+              <code>EvaluationContext.plan</code> field is <code>"pro"</code> —
+              regardless of their org — matches this rule and receives the
+              enabled variant.
+            </p>
+            <p>
+              This is why plan is a first-class rule type in the constants
+              rather than a custom attribute — it enables cross-org targeting in
+              a single row, as opposed to the O(orgs) duplication that adding
+              one rule per org would require.
+            </p>
+          </div>
+        </div>
+
+        <div class="qa-block">
+          <div class="qa-q">
+            <p>
+              Q4 — Where exactly is org isolation enforced, and how do you test
+              it holds?
+            </p>
+          </div>
+          <div class="qa-a">
+            <p>
+              Org isolation has two layers. First, at the rule-storage layer: an
+              org rule's <code>rule_value</code> is the org identifier (e.g.
+              <code>"org_a"</code>). The engine only returns
+              <code>true</code> for that rule when
+              <code>ctx.org_id</code> matches — a user in org_b cannot match an
+              org_a rule by construction, regardless of what mark key they
+              query.
+            </p>
+            <p>
+              Second, at the payload-trust layer (as discussed in Challenge 3):
+              enforcement is upstream. The application's auth middleware must
+              verify that the <code>org_id</code> in the
+              <code>EvaluationContext</code> is the org the authenticated user
+              actually belongs to. The commented-out membership check in
+              <code>marks.py</code> is available for operators who want to
+              enforce this at the control plane layer as well.
+            </p>
+            <p>
+              The integration test covers this: the seed data has org_a with an
+              active org rule on <code>new-dashboard</code>. Evaluating with
+              <code>org_id = "org_a"</code> returns <code>true</code>;
+              evaluating with <code>org_id = "org_b"</code> returns
+              <code>false</code> (the default). These are distinct assertions on
+              the same endpoint.
+            </p>
+          </div>
+        </div>
+
+        <div class="qa-block">
+          <div class="qa-q">
+            <p>
+              Q5 — A mark was changed at 2am and caused an incident. How does
+              the audit log answer "who, what before, what after" in under 60
+              seconds?
+            </p>
+          </div>
+          <div class="qa-a">
+            <p>
+              Every mutation — mark creation, toggle, rule add/update/delete —
+              writes an <code>AuditLog</code> row with: <code>mark_id</code>,
+              <code>actor</code> (the authenticated admin token identity),
+              <code>timestamp</code> (server-side <code>func.now()</code>),
+              <code>action</code> (e.g. <code>UPDATE_MARK</code>), and
+              JSON-serialized <code>old_state</code> and
+              <code>new_state</code> snapshots.
+            </p>
+            <p>
+              The on-call engineer calls
+              <code>GET /admin/marks/{id}/audit_logs</code> (or reads the Admin
+              Console's Audit Log timeline). The last 50 entries are returned
+              sorted descending by timestamp. The 2am entry shows
+              <code>old_state: {"is_active": true}</code> →
+              <code>new_state: {"is_active": false}</code> with the actor and
+              timestamp. Recovery is a single <code>PATCH</code> call to set
+              <code>is_active: true</code>. Total time: under 60 seconds.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TESTS & INFRA -->
+    <section>
+      <div class="wrap">
+        <div class="section-label">09 — Tests &amp; Infrastructure (D5)</div>
+        <h2>Tests, seed data &amp; Docker</h2>
+
+        <h3>Unit tests</h3>
+        <p>
+          Tests live in <code>app/tests/test_engine.py</code> and use plain
+          Python <code>SimpleNamespace</code> objects — no database, no FastAPI,
+          no HTTP client. The engine module's zero-dependency design makes this
+          possible.
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Test</th>
+                <th>What it verifies</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>test_user_rule_priority</code></td>
+                <td>
+                  User rule fires before org rule when both match. Confirms step
+                  ① beats step ②.
+                </td>
+              </tr>
+              <tr>
+                <td><code>test_percentage_rollout_is_deterministic</code></td>
+                <td>
+                  Same context evaluated twice returns identical result.
+                  Confirms hash stability.
+                </td>
+              </tr>
+              <tr>
+                <td><code>test_inactive_mark_returns_false</code></td>
+                <td>
+                  A mark with <code>is_active=False</code> returns false
+                  regardless of rules or default_value.
+                </td>
+              </tr>
+              <tr>
+                <td><code>test_default_fallback</code></td>
+                <td>No matching rules → default_value is returned.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Seed data</h3>
+        <p>
+          The <code>seed.sql</code> file creates a representative dataset: 2
+          orgs (<code>org_a</code>, <code>org_b</code>), 4 users distributed
+          across them, and 5 marks covering all major types:
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Mark</th>
+                <th>Type</th>
+                <th>Rule</th>
+                <th>Expected behavior</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>new-dashboard</code></td>
+                <td>release</td>
+                <td>org = org_a</td>
+                <td>true for org_a users, false for org_b</td>
+              </tr>
+              <tr>
+                <td><code>beta-feature</code></td>
+                <td>experiment</td>
+                <td>percentage = 50%</td>
+                <td>deterministically true for ~half of users</td>
+              </tr>
+              <tr>
+                <td><code>billing-kill-switch</code></td>
+                <td>kill_switch</td>
+                <td>user = user_4</td>
+                <td>true only for user_4 (other users get default=true)</td>
+              </tr>
+              <tr>
+                <td><code>checkout-system</code></td>
+                <td>kill_switch</td>
+                <td>(none)</td>
+                <td>default = true (parent)</td>
+              </tr>
+              <tr>
+                <td><code>checkout-v2-ui</code></td>
+                <td>release</td>
+                <td>org = org_a, parent = checkout-system</td>
+                <td>
+                  true for org_a; false when parent toggled off with cascade
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Docker Compose</h3>
+        <p>
+          A single <code>docker-compose up</code> starts all three services. The
+          backend defaults to SQLite locally but switches to Postgres via the
+          <code>DATABASE_URL</code> environment variable in production.
+        </p>
+
+        <div class="code-block">
+          <pre><span class="cm"># Three services — one command</span>
+<span class="kw">services</span>:
+  postgres:   <span class="cm">port 5432, seeds from seed.sql on init</span>
+  backend:    <span class="cm">port 8000, depends_on postgres, DATABASE_URL injected</span>
+  frontend:   <span class="cm">port 3000, depends_on backend</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ROADMAP -->
+    <section id="roadmap">
+      <div class="wrap">
+        <div class="section-label">10 — Future Roadmap</div>
+        <h2>Production hardening</h2>
+
+        <div class="card-grid">
+          <div class="card">
+            <h4>Alembic migrations</h4>
+            <p>
+              Replace <code>create_all</code> with tracked migration scripts for
+              deterministic schema evolution across environments.
+            </p>
+          </div>
+          <div class="card">
+            <h4>Redis + SSE</h4>
+            <p>
+              Distributed cache across Uvicorn workers, and Server-Sent Events
+              so frontend clients receive push updates when a flag toggles — no
+              page refresh needed.
+            </p>
+          </div>
+          <div class="card">
+            <h4>DAG cycle detection</h4>
+            <p>
+              Full BFS/DFS traversal on parent assignment to prevent deep
+              circular dependencies (A → B → C → A) which would cause infinite
+              recursion in hierarchy logic.
+            </p>
+          </div>
+          <div class="card">
+            <h4>Multi-environment</h4>
+            <p>
+              Add <code>environment_id</code> (dev/staging/prod) to marks and
+              rules — allowing 100% rollout in staging with 0% in production on
+              the same identity key.
+            </p>
+          </div>
+          <div class="card">
+            <h4>Audit log visualization</h4>
+            <p>
+              History tab rendering audit logs as a visual timeline, enabling
+              SOC2 compliance workflows and change tracking per flag.
+            </p>
+          </div>
+          <div class="card">
+            <h4>SDK clients</h4>
+            <p>
+              Typed Python and Node.js SDK packages wrapping the
+              <code>MarkClient</code> pattern, making integration into any
+              microservice a one-liner.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="wrap">
+        <p>
+          MarkControl · Fixit Engineering Assignment · Built with FastAPI ·
+          Next.js 14 · SQLAlchemy · Tailwind CSS
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>
